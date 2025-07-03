@@ -37,8 +37,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 config -> config
-                        .requestMatchers(HttpMethod.POST, EndPoints.STAFF_POST).hasRole("STAFF")
-                        .requestMatchers(HttpMethod.GET, EndPoints.STAFF_GET).hasRole("STAFF")
+                        .requestMatchers(HttpMethod.POST, EndPoints.STAFF_POST).hasAnyRole("STAFF","ADMIN")
+                        .requestMatchers(HttpMethod.GET, EndPoints.STAFF_GET).hasAnyRole("STAFF","ADMIN")
         );
         http.cors(cors -> {
             cors.configurationSource(request -> {
