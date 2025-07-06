@@ -37,6 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 config -> config
+                        .requestMatchers(HttpMethod.GET, EndPoints.PUBLIC_GET).permitAll()
                         .requestMatchers(HttpMethod.POST, EndPoints.STAFF_POST).hasAnyRole("STAFF","ADMIN")
                         .requestMatchers(HttpMethod.GET, EndPoints.STAFF_GET).hasAnyRole("STAFF","ADMIN")
         );

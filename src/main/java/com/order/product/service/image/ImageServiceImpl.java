@@ -5,6 +5,8 @@ import com.order.product.repository.IImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ImageServiceImpl implements IIMageService {
     @Autowired
@@ -13,5 +15,10 @@ public class ImageServiceImpl implements IIMageService {
     @Override
     public Image saveImage(Image image) {
         return this.imageRepository.save(image);
+    }
+
+    @Override
+    public List<Image> findByProductId(int productId) {
+        return this.imageRepository.findByProductId(productId);
     }
 }
