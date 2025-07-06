@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -47,6 +48,11 @@ public class ProductServiceImpl implements IProductService {
             this.iiMageService.saveImage(new Image(image, new Date(), "",newProductSave));
         }
         return productRepository.save(product);
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return this.productRepository.findAll();
     }
 
     private Brand getBrand(int brandId) {
