@@ -27,6 +27,7 @@ public class Product {
     private Date dateCreated;
 
     private int point;
+    private int quantity;
 
     @ManyToOne
     private Brand brand;

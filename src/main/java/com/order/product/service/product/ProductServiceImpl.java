@@ -36,11 +36,12 @@ public class ProductServiceImpl implements IProductService {
     public Product saveProduct(ProductForm productForm) {
         Product product = new Product();
         product.setProductName(productForm.getProductName());
+        product.setQuantity(productForm.getQuantity());
         product.setProductPrice(productForm.getProductPrice());
         product.setBrand(getBrand(productForm.getBrandId()));
         product.setDescription(productForm.getDescription());
         product.setProductUnit(getProductUnit(productForm.getProductUnitId()));
-        product.setPoint(5);
+        product.setPoint(productForm.getPoint());
         product.setDateCreated(new Date());
         String[] images = productForm.getImageLinks();
         Product newProductSave = productRepository.save(product);
@@ -53,6 +54,11 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public List<Product> getAllProducts() {
         return this.productRepository.findAll();
+    }
+
+    @Override
+    public List<Product> getAllProductOfBrand(int brandId) {
+        return this.productRepository.getAllProductOfBrand(brandId);
     }
 
     private Brand getBrand(int brandId) {

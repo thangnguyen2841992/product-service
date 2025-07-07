@@ -19,6 +19,8 @@ public class ProductForm {
 
     private double productPrice;
 
+    private int quantity;
+
     private String description;
 
     private int productUnitId;
