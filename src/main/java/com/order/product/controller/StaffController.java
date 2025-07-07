@@ -30,4 +30,9 @@ public class StaffController {
     public ResponseEntity<List<Product>> getAllProductsOfBrand(@RequestParam("brandId") int brandId) {
         return new ResponseEntity<>(this.productService.getAllProductOfBrand(brandId), HttpStatus.OK);
     }
+
+    @GetMapping("/getProductById")
+    public ResponseEntity<Product> getProductById(@RequestParam("productId") int id) {
+        return new ResponseEntity<>(this.productService.getProductById(id), HttpStatus.OK);
+    }
 }

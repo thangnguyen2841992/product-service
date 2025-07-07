@@ -61,6 +61,11 @@ public class ProductServiceImpl implements IProductService {
         return this.productRepository.getAllProductOfBrand(brandId);
     }
 
+    @Override
+    public Product getProductById(int id) {
+        return this.productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+    }
+
     private Brand getBrand(int brandId) {
         return this.brandService.findById(brandId);
     }
