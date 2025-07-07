@@ -11,4 +11,5 @@ public interface IProductService {
     Product saveProduct(ProductForm productForm);
     List<Product> getAllProducts();
     List<Product> getAllProductOfBrand(int brandId);
+
 }
