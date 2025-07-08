@@ -25,6 +25,7 @@ public class Product {
     private String description;
 
     private Date dateCreated;
+    private Date dateUpdated;
 
     private int point;
     private int quantity;

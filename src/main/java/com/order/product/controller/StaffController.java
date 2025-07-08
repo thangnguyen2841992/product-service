@@ -20,6 +20,10 @@ public class StaffController {
     public ResponseEntity<Product> createNewProduct(@RequestBody ProductForm productForm) {
         return new ResponseEntity<>(this.productService.saveProduct(productForm), HttpStatus.CREATED);
     }
+    @PostMapping("/updateProduct")
+    public ResponseEntity<Product> updateProduct(@RequestBody ProductForm productForm) {
+        return new ResponseEntity<>(this.productService.updateProduct(productForm), HttpStatus.OK);
+    }
 
     @GetMapping("/getAllProducts")
     public ResponseEntity<List<Product>> getAllProducts() {

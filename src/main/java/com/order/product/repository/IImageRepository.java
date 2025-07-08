@@ -13,4 +13,6 @@ public interface IImageRepository extends JpaRepository<Image, Integer> {
 
     @Query(value = "select * from image where product_product_id = :productId", nativeQuery = true)
     List<Image> findByProductId(@Param("productId") int productId);
+
+    void deleteByImageIdIn(List<Integer> imageIds);
 }

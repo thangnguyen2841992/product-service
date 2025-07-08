@@ -4,6 +4,7 @@ import com.order.product.model.entity.Image;
 import com.order.product.repository.IImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,5 +21,16 @@ public class ImageServiceImpl implements IIMageService {
     @Override
     public List<Image> findByProductId(int productId) {
         return this.imageRepository.findByProductId(productId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByImageIdIn(List<Integer> imageIds) {
+        this.imageRepository.deleteByImageIdIn(imageIds);
+    }
+
+    @Override
+    public void deleteImageById(int id) {
+        this.imageRepository.deleteById(id);
     }
 }

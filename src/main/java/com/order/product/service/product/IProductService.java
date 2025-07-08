@@ -12,4 +12,5 @@ public interface IProductService {
     List<Product> getAllProducts();
     List<Product> getAllProductOfBrand(int brandId);
     Product getProductById(int id);
+    Product updateProduct(ProductForm productForm);
 }

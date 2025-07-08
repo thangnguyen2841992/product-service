@@ -8,6 +8,11 @@ import java.util.List;
 public interface IIMageService {
     Image saveImage(Image image);
 
-    List<Image> findByProductId(@Param("productId") int productId);
+    List<Image> findByProductId(int productId);
+
+    void deleteByImageIdIn(List<Integer> imageIds);
+
+    void deleteImageById(int id);
+
 
 }

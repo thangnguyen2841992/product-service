@@ -1,6 +1,7 @@
 package com.order.product.model.dto;
 
 import com.order.product.model.entity.Brand;
+import com.order.product.model.entity.Image;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -32,4 +33,5 @@ public class ProductForm {
     private int brandId;
 
     private String[] imageLinks;
+    private Image[] imageList;
 }
