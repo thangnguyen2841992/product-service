@@ -34,10 +34,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Autowired
     private IIMageService iiMageService;
-    
+
     @Autowired
     private IImageRepository imageRepository;
-
 
 
     @Override
@@ -51,12 +50,22 @@ public class ProductServiceImpl implements IProductService {
         product.setProductUnit(getProductUnit(productForm.getProductUnitId()));
         product.setPoint(productForm.getPoint());
         product.setDateCreated(new Date());
-        String[] images = productForm.getImageLinks();
         Product newProductSave = productRepository.save(product);
-        for (String image : images) {
-            this.iiMageService.saveImage(new Image(image, new Date(), "",newProductSave));
+        if (productForm.getImageList() != null) {
+            List<Image> imagesToAdd = Arrays.stream(productForm.getImageList())
+                    .filter(image -> image.getImageId() == 0)
+                    .map(image -> {
+                        image.setDateCreated(new Date());
+                        image.setProduct(newProductSave);
+                        return image;
+                    })
+                    .collect(Collectors.toList());
+
+            if (!imagesToAdd.isEmpty()) {
+                imageRepository.saveAll(imagesToAdd);
+            }
         }
-        return productRepository.save(product);
+        return newProductSave;
     }
 
     @Override
@@ -87,16 +96,16 @@ public class ProductServiceImpl implements IProductService {
             product.setProductUnit(getProductUnit(productForm.getProductUnitId()));
             product.setPoint(productForm.getPoint());
             product.setDateUpdated(new Date());
-            this.productRepository.save(product);
+            Product newProduct = this.productRepository.save(product);
             List<Image> imageList = this.iiMageService.findByProductId(product.getProductId());
-            editImages(productForm, imageList);
+            editImages(productForm, imageList, newProduct);
             return product;
         } else {
             return null;
         }
     }
 
-    private void editImages(ProductForm productForm, List<Image> imageList) {
+    private void editImages(ProductForm productForm, List<Image> imageList, Product newProduct) {
         List<Integer> currentImageIds = imageList.stream()
                 .map(Image::getImageId)
                 .toList();
@@ -115,6 +124,7 @@ public class ProductServiceImpl implements IProductService {
                 .filter(image -> image.getImageId() == 0)
                 .peek(image -> {
                     image.setDateCreated(new Date());
+                    image.setProduct(newProduct);
                 })
                 .collect(Collectors.toList());
 
