@@ -74,6 +74,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public List<Product> getAllProductsUser() {
+        return this.productRepository.getAllProductsUser();
+    }
+
+    @Override
     public List<Product> getAllProductOfBrand(int brandId) {
         return this.productRepository.getAllProductOfBrand(brandId);
     }
@@ -103,6 +108,18 @@ public class ProductServiceImpl implements IProductService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Product deleteProduct(int productId) {
+        Optional<Product> productOptional = this.productRepository.findById(productId);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            product.setDelete(true);
+            product.setDateUpdated(new Date());
+            return this.productRepository.save(product);
+        }
+        return null;
     }
 
     private void editImages(ProductForm productForm, List<Image> imageList, Product newProduct) {

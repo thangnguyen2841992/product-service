@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface IProductRepository extends JpaRepository<Product, Integer> {
 
-    @Query(value = "select * from product where brand_brand_id = :brandId", nativeQuery = true)
+    @Query(value = "select * from product where brand_brand_id = :brandId and is_delete = false", nativeQuery = true)
     List<Product> getAllProductOfBrand(@Param("brandId") int brandId);
+
+    @Query(value = "select * from product where is_delete = false", nativeQuery = true)
+    List<Product> getAllProductsUser();
 }

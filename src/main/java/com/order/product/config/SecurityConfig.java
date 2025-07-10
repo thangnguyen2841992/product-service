@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, EndPoints.STAFF_POST).hasAnyRole("STAFF","ADMIN")
                         .requestMatchers(HttpMethod.GET, EndPoints.STAFF_GET).hasAnyRole("STAFF","ADMIN")
                         .requestMatchers(HttpMethod.GET, EndPoints.USER_GET).hasAnyRole("STAFF","ADMIN","USER")
+                        .requestMatchers(HttpMethod.POST, EndPoints.USER_POST).hasAnyRole("STAFF","ADMIN","USER")
         );
         http.cors(cors -> {
             cors.configurationSource(request -> {

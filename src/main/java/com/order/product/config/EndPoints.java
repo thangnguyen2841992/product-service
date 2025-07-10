@@ -12,7 +12,11 @@ public class EndPoints {
     };
     public static final String[] USER_GET = {
             "/brand-api/**",
-            "/product-unit-api/**"
+            "/product-unit-api/**",
+            "/user-api/**"
+    };
+    public static final String[] USER_POST = {
+            "/user-api/**"
     };
     public static final String FRONT_END_HOST = "http://localhost:3000";
 

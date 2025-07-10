@@ -29,6 +29,7 @@ public class Product {
 
     private int point;
     private int quantity;
+    private boolean isDelete;
 
     @ManyToOne
     private Brand brand;
