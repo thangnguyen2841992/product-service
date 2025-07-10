@@ -38,6 +38,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 config -> config
                         .requestMatchers(HttpMethod.GET, EndPoints.PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, EndPoints.PUBLIC_GET).permitAll()
                         .requestMatchers(HttpMethod.POST, EndPoints.STAFF_POST).hasAnyRole("STAFF","ADMIN")
                         .requestMatchers(HttpMethod.GET, EndPoints.STAFF_GET).hasAnyRole("STAFF","ADMIN")
                         .requestMatchers(HttpMethod.GET, EndPoints.USER_GET).hasAnyRole("STAFF","ADMIN","USER")

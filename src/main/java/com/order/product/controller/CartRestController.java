@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 import java.util.Objects;
 
-@RestController
-@RequestMapping("/cart-api")
 public class CartRestController {
     @Autowired
     private ICartService cartService;
