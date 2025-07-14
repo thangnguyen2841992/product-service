@@ -66,6 +66,11 @@ public class CartServiceImpl implements ICartService {
         }
     }
 
+    @Override
+    public List<ProductCart> findProductCartByUserId(int userId) {
+        return this.productCartRepository.findProductCartByUserId(userId);
+    }
+
     private void getAllProductCartOfCart(Optional<Cart> cartOptional, CartResponse cartResponse) {
         List<ProductCart> productCartList;
         productCartList = this.productCartRepository.findAllProductCartByCartId(cartOptional.get().getCartId());

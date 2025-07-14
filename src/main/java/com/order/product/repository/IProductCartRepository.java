@@ -14,4 +14,7 @@ public interface IProductCartRepository extends JpaRepository<ProductCart, Integ
     @Query(value = "select * from product_cart where cart_id = :cartId", nativeQuery = true)
     List<ProductCart> findAllProductCartByCartId(@Param("cartId") int cartId);
 
+    @Query(value = "select * from product_cart where cart_id = (select cart_id form cart where user_id = :user_id)", nativeQuery = true)
+    List<ProductCart> findProductCartByUserId(int userId);
+
 }
