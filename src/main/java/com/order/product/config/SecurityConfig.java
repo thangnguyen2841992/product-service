@@ -48,8 +48,9 @@ public class SecurityConfig {
             cors.configurationSource(request -> {
                 CorsConfiguration corsConfig = new CorsConfiguration();
                 corsConfig.addAllowedOrigin(EndPoints.FRONT_END_HOST);
-                corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+                corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 corsConfig.addAllowedHeader("*");
+                corsConfig.setAllowCredentials(true); // Quan trọng để cho phép thông tin xác thực
                 return corsConfig;
             });
         });

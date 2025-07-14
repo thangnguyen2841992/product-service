@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CartForm {
-    private ProductCartForm[] products;
+    private ProductCartForm product;
 
     private int userId;
 

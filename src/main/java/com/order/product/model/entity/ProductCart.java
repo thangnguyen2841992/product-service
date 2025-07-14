@@ -27,4 +27,6 @@ public class ProductCart {
 
     private Date dateCreated;
 
+    private Date dateUpdated;
+
 }

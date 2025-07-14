@@ -9,17 +9,20 @@ public class EndPoints {
     };
     public static final String[] PUBLIC_GET = {
             "/image-api/**",
-            "/cart-api/**"
+            "/cart-api/**",
+            "/ws/**",
     };
     public static final String[] PUBLIC_POST = {
             "/image-api/**",
-            "/cart-api/**"
+            "/cart-api/**",
+            "/ws/**",
+
     };
     public static final String[] USER_GET = {
             "/brand-api/**",
             "/product-unit-api/**",
             "/user-api/**",
-            "/cart-api/**"
+            "/cart-api/**",
 
     };
     public static final String[] USER_POST = {
