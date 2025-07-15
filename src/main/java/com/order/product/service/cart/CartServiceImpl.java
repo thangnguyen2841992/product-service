@@ -73,7 +73,7 @@ public class CartServiceImpl implements ICartService {
         if (productCartOptional.isPresent()) {
             ProductCart productCart = productCartOptional.get();
             if (productCartForm.getQuantity() == 0) {
-                if (productCart.getQuantity() > 2) {
+                if (productCart.getQuantity() >= 2) {
                     productCart.setQuantity(productCart.getQuantity() - 1);
                     productCart.setDateUpdated(new Date());
                     this.productCartRepository.save(productCart);
