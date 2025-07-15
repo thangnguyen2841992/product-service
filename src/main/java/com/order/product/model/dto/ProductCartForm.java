@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class ProductCartForm {
     private int productId;
     private int quantity;
+    private int userId;
 }

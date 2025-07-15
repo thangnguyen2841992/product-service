@@ -24,7 +24,6 @@ public class CartServiceImpl implements ICartService {
     @Autowired
     private ICartRepository cartRepository;
 
-
     @Override
     public CartResponse saveNewCart(CartForm cartForm) {
         Optional<Cart> cartOptional = this.cartRepository.findCartByUserId(cartForm.getUserId());
@@ -47,12 +46,12 @@ public class CartServiceImpl implements ICartService {
             List<ProductCart> productCartList = this.productCartRepository.findAllProductCartByCartId(cartOptional.get().getCartId());
             ProductCartForm productCartForm = cartForm.getProduct();
             ProductCart existProductCart = productCartList.stream().filter(productCart -> productCart.getProductId() == cartForm.getProduct().getProductId()).findFirst().orElse(null);
-            if (existProductCart != null ) {
-                    if (existProductCart.getQuantity() != productCartForm.getQuantity()) {
-                        existProductCart.setQuantity(cartForm.getProduct().getQuantity());
-                        existProductCart.setDateUpdated(new Date());
-                        this.productCartRepository.save(existProductCart);
-                    }
+            if (existProductCart != null) {
+                if (existProductCart.getQuantity() != productCartForm.getQuantity()) {
+                    existProductCart.setQuantity(cartForm.getProduct().getQuantity());
+                    existProductCart.setDateUpdated(new Date());
+                    this.productCartRepository.save(existProductCart);
+                }
             } else {
                 ProductCart productCartNew = new ProductCart();
                 productCartNew.setProductId(productCartForm.getProductId());
@@ -67,8 +66,39 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
-    public List<ProductCart> findProductCartByUserId(int userId) {
-        return this.productCartRepository.findProductCartByUserId(userId);
+    public CartResponse editQuantity(ProductCartForm productCartForm) {
+        Cart cart = this.cartRepository.findCartByUserId(productCartForm.getUserId()).orElseThrow(() -> new RuntimeException("Not Found"));
+        List<ProductCart> productCartList = this.productCartRepository.findAllProductCartByCartId(cart.getCartId());
+        Optional<ProductCart> productCartOptional = productCartList.stream().filter(productCartData -> productCartData.getProductId() == productCartForm.getProductId()).findFirst();
+        if (productCartOptional.isPresent()) {
+            ProductCart productCart = productCartOptional.get();
+            if (productCartForm.getQuantity() == 0) {
+                if (productCart.getQuantity() > 2) {
+                    productCart.setQuantity(productCart.getQuantity() - 1);
+                    productCart.setDateUpdated(new Date());
+                    this.productCartRepository.save(productCart);
+                } else {
+                    this.productCartRepository.deleteById(productCart.getProductCartId());
+                }
+            } else {
+                productCart.setQuantity(productCart.getQuantity() + 1);
+                productCart.setDateUpdated(new Date());
+                this.productCartRepository.save(productCart);
+            }
+        }
+        return getCartResponseByUserId(productCartForm.getUserId());
+    }
+
+    @Override
+    public CartResponse getCartResponseByUserId(int userId) {
+        CartResponse cartResponse = new CartResponse();
+        Cart cart = this.cartRepository.findCartByUserId(userId).orElseThrow(() -> new RuntimeException("Not Found"));
+        List<ProductCart> productCartList = this.productCartRepository.findAllProductCartByCartId(cart.getCartId());
+        cartResponse.setCartId(cart.getCartId());
+        cartResponse.setUserId(cart.getUserId());
+        cartResponse.setDateCreated(cart.getDateCreated());
+        cartResponse.setProductCartList(productCartList);
+        return cartResponse;
     }
 
     private void getAllProductCartOfCart(Optional<Cart> cartOptional, CartResponse cartResponse) {
@@ -79,4 +109,5 @@ public class CartServiceImpl implements ICartService {
         cartResponse.setDateCreated(cartOptional.get().getDateCreated());
         cartResponse.setProductCartList(productCartList);
     }
+
 }

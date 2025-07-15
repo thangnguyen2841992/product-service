@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.order.product.model.dto.CartForm;
 import com.order.product.model.dto.CartResponse;
-import com.order.product.model.entity.ProductCart;
+import com.order.product.model.dto.ProductCartForm;
 import com.order.product.service.cart.ICartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,8 +15,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 public class CartRestController {
@@ -38,8 +36,20 @@ public class CartRestController {
         }
     }
 
-    @GetMapping("/getAllProductCartOfUserId")
-    public ResponseEntity<List<ProductCart>> getAllProductCartOfUserId(@RequestParam(name = "userId") int userId) {
-        return new ResponseEntity<>(this.cartService.findProductCartByUserId(userId), HttpStatus.OK);
+    @MessageMapping("/edit-quantity")
+    public void editQuantity(@Payload String message) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ProductCartForm productCartForm = objectMapper.readValue(message, ProductCartForm.class);
+            CartResponse cartResponse = this.cartService.editQuantity(productCartForm);
+            simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/cart-api/getAllProductCartOfUserId")
+    public ResponseEntity<CartResponse> getCartOfUserId(@RequestParam(name = "userId") int userId) {
+        return new ResponseEntity<>(this.cartService.getCartResponseByUserId(userId), HttpStatus.OK);
     }
 }

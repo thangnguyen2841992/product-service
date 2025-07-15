@@ -28,7 +28,6 @@ public class EndPoints {
     public static final String[] USER_POST = {
             "/user-api/**",
             "/cart-api/**"
-
     };
     public static final String FRONT_END_HOST = "http://localhost:3000";
 
