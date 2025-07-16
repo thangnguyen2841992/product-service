@@ -13,10 +13,13 @@ import com.order.product.service.productUnit.IProductUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 
@@ -61,9 +64,44 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<Product> uploadProducts(ProductForm[] productForm) {
+        List<Product> products = new ArrayList<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Future<Product>> futures = new ArrayList<>();
+
         for (ProductForm data : productForm) {
-            Product productSave = addProductFormProductForm(data);
+            futures.add(executorService.submit(() -> {
+                // Lưu sản phẩm
+                Product productSave = addProductFormProductForm(data);
+                Image[] imagePath = data.getImageList();
+
+                // Duyệt qua các ảnh và chuyển đổi thành Base64
+                for (Image image : imagePath) {
+                    String imageLink = image.getImageLink();
+                    try {
+                        String base64Image = convertImageToBase64(imageLink);
+                        image.setImageLink(base64Image);
+                        image.setDateCreated(new Date());
+                        image.setProduct(productSave);
+                        imageRepository.save(image);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                return productSave; // Trả về sản phẩm đã lưu
+            }));
         }
+
+        // Đợi tất cả các tác vụ hoàn thành và thu thập kết quả
+        for (Future<Product> future : futures) {
+            try {
+                products.add(future.get());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        executorService.shutdown();
+        return products;
     }
 
     private Product addProductFormProductForm(ProductForm productForm) {
@@ -168,6 +206,12 @@ public class ProductServiceImpl implements IProductService {
 
     private ProductUnit getProductUnit(int productUnitId) {
         return this.productUnitService.getProductUnitById(productUnitId).orElseThrow(() -> new RuntimeException("Not Found"));
+    }
+
+    private String convertImageToBase64(String imagePath) throws IOException {
+        Path path = Path.of(imagePath);
+        byte[] fileContent = Files.readAllBytes(path);
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 
 }
