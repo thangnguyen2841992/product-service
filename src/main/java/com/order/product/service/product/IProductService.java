@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface IProductService {
     Product saveProduct(ProductForm productForm);
+    List<Product> uploadProducts(ProductForm[] productForm);
     List<Product> getAllProducts();
     List<Product> getAllProductsUser();
     List<Product> getAllProductOfBrand(int brandId);

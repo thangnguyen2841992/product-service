@@ -44,4 +44,8 @@ public class StaffController {
     public ResponseEntity<Product> deleteProduct(@RequestParam("productId") int id) {
         return new ResponseEntity<>(this.productService.deleteProduct(id), HttpStatus.OK);
     }
+    @PostMapping("/uploadProducts")
+    public ResponseEntity<List<Product>> uploadProducts(@RequestBody ProductForm[] productForm) {
+        return new ResponseEntity<>(this.productService.uploadProducts(productForm), HttpStatus.CREATED);
+    }
 }

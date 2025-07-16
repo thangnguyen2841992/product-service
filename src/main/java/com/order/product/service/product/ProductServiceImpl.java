@@ -41,16 +41,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Product saveProduct(ProductForm productForm) {
-        Product product = new Product();
-        product.setProductName(productForm.getProductName());
-        product.setQuantity(productForm.getQuantity());
-        product.setProductPrice(productForm.getProductPrice());
-        product.setBrand(getBrand(productForm.getBrandId()));
-        product.setDescription(productForm.getDescription());
-        product.setProductUnit(getProductUnit(productForm.getProductUnitId()));
-        product.setPoint(productForm.getPoint());
-        product.setDateCreated(new Date());
-        Product newProductSave = productRepository.save(product);
+        Product newProductSave = addProductFormProductForm(productForm);
         if (productForm.getImageList() != null) {
             List<Image> imagesToAdd = Arrays.stream(productForm.getImageList())
                     .filter(image -> image.getImageId() == 0)
@@ -66,6 +57,26 @@ public class ProductServiceImpl implements IProductService {
             }
         }
         return newProductSave;
+    }
+
+    @Override
+    public List<Product> uploadProducts(ProductForm[] productForm) {
+        for (ProductForm data : productForm) {
+            Product productSave = addProductFormProductForm(data);
+        }
+    }
+
+    private Product addProductFormProductForm(ProductForm productForm) {
+        Product product = new Product();
+        product.setProductName(productForm.getProductName());
+        product.setQuantity(productForm.getQuantity());
+        product.setProductPrice(productForm.getProductPrice());
+        product.setBrand(getBrand(productForm.getBrandId()));
+        product.setDescription(productForm.getDescription());
+        product.setProductUnit(getProductUnit(productForm.getProductUnitId()));
+        product.setPoint(productForm.getPoint());
+        product.setDateCreated(new Date());
+        return productRepository.save(product);
     }
 
     @Override
@@ -158,4 +169,5 @@ public class ProductServiceImpl implements IProductService {
     private ProductUnit getProductUnit(int productUnitId) {
         return this.productUnitService.getProductUnitById(productUnitId).orElseThrow(() -> new RuntimeException("Not Found"));
     }
+
 }

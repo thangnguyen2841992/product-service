@@ -16,6 +16,7 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int imageId;
 
+    @Lob
     private String imageLink;
 
     private Date dateCreated;
