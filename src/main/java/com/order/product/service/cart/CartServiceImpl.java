@@ -62,8 +62,8 @@ public class CartServiceImpl implements ICartService {
                 productCartNew.setCartId(cartOptional.get().getCartId());
                 ProductCart newProductCartSave = this.productCartRepository.save(productCartNew);
             }
-            getAllProductCartOfCart(cartOptional, cartResponse);
-            return cartResponse;
+
+            return getCartResponseByUserId(cartForm.getUserId());
         }
     }
 
