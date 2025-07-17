@@ -13,4 +13,5 @@ public interface ICartRepository extends JpaRepository<Cart, Integer> {
 
     @Query(value = "select * from cart where user_id = :userId", nativeQuery = true)
     Optional<Cart> findCartByUserId( @Param("userId") int userId);
+
 }

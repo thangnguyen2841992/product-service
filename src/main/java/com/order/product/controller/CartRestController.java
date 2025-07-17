@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.order.product.model.dto.CartForm;
 import com.order.product.model.dto.CartResponse;
+import com.order.product.model.dto.DeleteProductCartForm;
 import com.order.product.model.dto.ProductCartForm;
 import com.order.product.service.cart.ICartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,29 @@ public class CartRestController {
         try {
             ProductCartForm productCartForm = objectMapper.readValue(message, ProductCartForm.class);
             CartResponse cartResponse = this.cartService.editQuantity(productCartForm);
+            simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @MessageMapping("/delete-product-cart")
+    public void deleteProductCart(@Payload String message) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            DeleteProductCartForm deleteProductCartForm = objectMapper.readValue(message, DeleteProductCartForm.class);
+            CartResponse cartResponse = this.cartService.removeProductCart(deleteProductCartForm.getProductCartId());
+            simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @MessageMapping("/deleteAllProductCart")
+    public void deleteAllProductCart(@Payload String message) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            DeleteProductCartForm deleteProductCartForm = objectMapper.readValue(message, DeleteProductCartForm.class);
+            CartResponse cartResponse = this.cartService.removeAllProductCart(deleteProductCartForm.getCartId());
             simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

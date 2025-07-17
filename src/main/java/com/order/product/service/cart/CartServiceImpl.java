@@ -121,6 +121,21 @@ public class CartServiceImpl implements ICartService {
         return cartResponse;
     }
 
+    @Override
+    public CartResponse removeProductCart(int productCartId) {
+        Optional<ProductCart> productCartOptional = this.productCartRepository.findById(productCartId);
+        productCartOptional.ifPresent(productCart -> this.productCartRepository.deleteById(productCart.getProductCartId()));
+        Cart cart = this.cartRepository.findById(productCartOptional.get().getCartId()).orElseThrow(() -> new RuntimeException("Not Found"));
+        return getCartResponseByUserId(cart.getUserId());
+    }
+
+    @Override
+    public CartResponse removeAllProductCart(int cartId) {
+        this.productCartRepository.deleteAllProductOfCart(cartId);
+        Cart cart = this.cartRepository.findById(cartId).orElseThrow(() -> new RuntimeException("Not Found"));
+        return getCartResponseByUserId(cart.getUserId());
+    }
+
     private void getAllProductCartOfCart(Optional<Cart> cartOptional, CartResponse cartResponse) {
         List<ProductCart> productCartList;
         productCartList = this.productCartRepository.findAllProductCartByCartId(cartOptional.get().getCartId());
