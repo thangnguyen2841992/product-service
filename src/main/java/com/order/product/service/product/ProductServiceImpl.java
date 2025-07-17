@@ -65,6 +65,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public List<Product> uploadProducts(ProductForm[] productForm) {
         List<Product> products = new ArrayList<>();
+
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Future<Product>> futures = new ArrayList<>();
 
@@ -91,6 +92,34 @@ public class ProductServiceImpl implements IProductService {
             }));
         }
 
+        // Đợi tất cả các tác vụ hoàn thành và thu thập kết quả
+        for (Future<Product> future : futures) {
+            try {
+                products.add(future.get());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        executorService.shutdown();
+        return products;
+    }
+
+    @Override
+    public List<Product> uploadEditProducts(ProductForm[] productForm) {
+        List<Product> products = new ArrayList<>();
+
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Future<Product>> futures = new ArrayList<>();
+        for (ProductForm data : productForm) {
+            futures.add(executorService.submit(() -> {
+                Product product = this.productRepository.findById(data.getProductId()).orElseThrow(() -> new RuntimeException("Not Found"));
+                    product.setQuantity(product.getQuantity() + data.getQuantity());
+                    product.setDateUpdated(new Date());
+                    this.productRepository.save(product);
+                    return product;
+            }));
+        }
         // Đợi tất cả các tác vụ hoàn thành và thu thập kết quả
         for (Future<Product> future : futures) {
             try {

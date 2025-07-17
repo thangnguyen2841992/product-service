@@ -8,13 +8,12 @@ import com.order.product.model.entity.Product;
 import com.order.product.model.entity.ProductCart;
 import com.order.product.repository.ICartRepository;
 import com.order.product.repository.IProductCartRepository;
+import com.order.product.repository.IProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl implements ICartService {
@@ -23,6 +22,9 @@ public class CartServiceImpl implements ICartService {
 
     @Autowired
     private ICartRepository cartRepository;
+
+    @Autowired
+    private IProductRepository productRepository;
 
     @Override
     public CartResponse saveNewCart(CartForm cartForm) {
@@ -94,6 +96,24 @@ public class CartServiceImpl implements ICartService {
         CartResponse cartResponse = new CartResponse();
         Cart cart = this.cartRepository.findCartByUserId(userId).orElseThrow(() -> new RuntimeException("Not Found"));
         List<ProductCart> productCartList = this.productCartRepository.findAllProductCartByCartId(cart.getCartId());
+        List<Integer> productIds = productCartList.stream()
+                .map(ProductCart::getProductId)
+                .collect(Collectors.toList());
+
+        Map<Integer, Product> productMap = this.productRepository.findAllById(productIds)
+                .stream()
+                .collect(Collectors.toMap(Product::getProductId, product -> product));
+
+        long totalPrice = productCartList.stream()
+                .mapToLong(productCart -> {
+                    Product product = productMap.get(productCart.getProductId());
+                    if (product == null) {
+                        throw new RuntimeException("Not Found");
+                    }
+                    return (long) (product.getProductPrice() * productCart.getQuantity());
+                })
+                .sum();
+        cartResponse.setTotalPrice(totalPrice);
         cartResponse.setCartId(cart.getCartId());
         cartResponse.setUserId(cart.getUserId());
         cartResponse.setDateCreated(cart.getDateCreated());

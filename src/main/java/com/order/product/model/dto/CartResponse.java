@@ -19,4 +19,6 @@ public class CartResponse {
     List<ProductCart> productCartList;
 
     private Date dateCreated;
+
+    private long totalPrice;
 }

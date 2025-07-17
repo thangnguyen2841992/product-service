@@ -48,4 +48,9 @@ public class StaffController {
     public ResponseEntity<List<Product>> uploadProducts(@RequestBody ProductForm[] productForm) {
         return new ResponseEntity<>(this.productService.uploadProducts(productForm), HttpStatus.CREATED);
     }
+
+    @PostMapping("/uploadEditProducts")
+    public ResponseEntity<List<Product>> uploadEditProducts(@RequestBody ProductForm[] productForm) {
+        return new ResponseEntity<>(this.productService.uploadEditProducts(productForm), HttpStatus.CREATED);
+    }
 }
