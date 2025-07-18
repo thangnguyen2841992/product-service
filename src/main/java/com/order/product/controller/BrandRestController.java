@@ -21,5 +21,4 @@ public class BrandRestController {
     public ResponseEntity<List<Brand>> getAllBrands() {
         return new ResponseEntity<>(this.brandService.findAll(), HttpStatus.OK);
     }
-
 }
