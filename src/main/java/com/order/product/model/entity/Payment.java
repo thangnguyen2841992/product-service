@@ -8,24 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
-public class ProductOrder {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int productOrderId;
+    private int paymentId;
 
-    private int orderId;
-
-    private int quantity;
-
-    private int productId;
-
-    private Date dateCreated;
-
-    private boolean isDelete;
+    private String name;
 }

@@ -21,4 +21,6 @@ public class CartResponse {
     private Date dateCreated;
 
     private long totalPrice;
+
+    private long totalProduct;
 }

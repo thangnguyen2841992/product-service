@@ -12,6 +12,7 @@ import com.order.product.service.image.IIMageService;
 import com.order.product.service.productUnit.IProductUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +42,7 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private IImageRepository imageRepository;
 
-
+    @Transactional
     @Override
     public Product saveProduct(ProductForm productForm) {
         Product newProductSave = addProductFormProductForm(productForm);
@@ -62,6 +63,7 @@ public class ProductServiceImpl implements IProductService {
         return newProductSave;
     }
 
+    @Transactional
     @Override
     public List<Product> uploadProducts(ProductForm[] productForm) {
         List<Product> products = new ArrayList<>();
@@ -105,6 +107,7 @@ public class ProductServiceImpl implements IProductService {
         return products;
     }
 
+    @Transactional
     @Override
     public List<Product> uploadEditProducts(ProductForm[] productForm) {
         List<Product> products = new ArrayList<>();
@@ -114,10 +117,10 @@ public class ProductServiceImpl implements IProductService {
         for (ProductForm data : productForm) {
             futures.add(executorService.submit(() -> {
                 Product product = this.productRepository.findById(data.getProductId()).orElseThrow(() -> new RuntimeException("Not Found"));
-                    product.setQuantity(product.getQuantity() + data.getQuantity());
-                    product.setDateUpdated(new Date());
-                    this.productRepository.save(product);
-                    return product;
+                product.setQuantity(product.getQuantity() + data.getQuantity());
+                product.setDateUpdated(new Date());
+                this.productRepository.save(product);
+                return product;
             }));
         }
         // Đợi tất cả các tác vụ hoàn thành và thu thập kết quả
@@ -132,6 +135,7 @@ public class ProductServiceImpl implements IProductService {
         executorService.shutdown();
         return products;
     }
+
 
     private Product addProductFormProductForm(ProductForm productForm) {
         Product product = new Product();
@@ -166,6 +170,7 @@ public class ProductServiceImpl implements IProductService {
         return this.productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
+    @Transactional
     @Override
     public Product updateProduct(ProductForm productForm) {
         Optional<Product> productOptional = this.productRepository.findById(productForm.getProductId());

@@ -11,6 +11,7 @@ import com.order.product.repository.IProductCartRepository;
 import com.order.product.repository.IProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class CartServiceImpl implements ICartService {
     @Autowired
     private IProductRepository productRepository;
 
+    @Transactional
     @Override
     public CartResponse saveNewCart(CartForm cartForm) {
         Optional<Cart> cartOptional = this.cartRepository.findCartByUserId(cartForm.getUserId());
@@ -67,6 +69,7 @@ public class CartServiceImpl implements ICartService {
         }
     }
 
+    @Transactional
     @Override
     public CartResponse editQuantity(ProductCartForm productCartForm) {
         Cart cart = this.cartRepository.findCartByUserId(productCartForm.getUserId()).orElseThrow(() -> new RuntimeException("Not Found"));
@@ -113,11 +116,17 @@ public class CartServiceImpl implements ICartService {
                     return (long) (product.getProductPrice() * productCart.getQuantity());
                 })
                 .sum();
+
+
+        long totalQuantity = productCartList.stream()
+                .mapToLong(ProductCart::getQuantity)
+                .sum();
         cartResponse.setTotalPrice(totalPrice);
         cartResponse.setCartId(cart.getCartId());
         cartResponse.setUserId(cart.getUserId());
         cartResponse.setDateCreated(cart.getDateCreated());
         cartResponse.setProductCartList(productCartList);
+        cartResponse.setTotalProduct(totalQuantity);
         return cartResponse;
     }
 
