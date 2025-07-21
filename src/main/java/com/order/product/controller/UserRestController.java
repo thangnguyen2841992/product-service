@@ -20,7 +20,7 @@ public class UserRestController {
 
     @GetMapping("/getAllProducts")
     public ResponseEntity<List<Product>> getAllProducts(){
-        return new ResponseEntity<>(this.productService.getAllProducts(), HttpStatus.OK );
+        return new ResponseEntity<>(this.productService.getAllProductsUser(), HttpStatus.OK );
     }
     @GetMapping("/getProductById")
     public ResponseEntity<Product> getProductById(@RequestParam("productId") int id) {
