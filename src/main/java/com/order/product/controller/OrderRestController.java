@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.order.product.model.dto.CartForm;
 import com.order.product.model.dto.CartResponse;
+import com.order.product.model.dto.MessageError;
 import com.order.product.model.dto.OrderForm;
 import com.order.product.service.cart.ICartService;
 import com.order.product.service.order.IOrderService;
@@ -28,6 +29,9 @@ public class OrderRestController {
             OrderForm orderForm = objectMapper.readValue(message, OrderForm.class);
             CartResponse cartResponse = this.orderService.createNewOrder(orderForm);
             simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
+            MessageError messageError = new MessageError();
+            messageError.setMessage("Bạn đã đặt hàng thành công. Chúng tôi đang xử lý đơn hàng của bạn.");
+            simpMessagingTemplate.convertAndSend("/topic/order", messageError);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

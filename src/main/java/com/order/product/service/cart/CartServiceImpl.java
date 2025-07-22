@@ -2,6 +2,7 @@ package com.order.product.service.cart;
 
 import com.order.product.model.dto.CartForm;
 import com.order.product.model.dto.CartResponse;
+import com.order.product.model.dto.MessageError;
 import com.order.product.model.dto.ProductCartForm;
 import com.order.product.model.entity.Cart;
 import com.order.product.model.entity.Product;
@@ -10,6 +11,7 @@ import com.order.product.repository.ICartRepository;
 import com.order.product.repository.IProductCartRepository;
 import com.order.product.repository.IProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,9 @@ public class CartServiceImpl implements ICartService {
 
     @Autowired
     private IProductRepository productRepository;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional
     @Override
@@ -71,7 +76,7 @@ public class CartServiceImpl implements ICartService {
 
     @Transactional
     @Override
-    public CartResponse editQuantity(ProductCartForm productCartForm) {
+    public void editQuantity(ProductCartForm productCartForm) {
         Cart cart = this.cartRepository.findCartByUserId(productCartForm.getUserId()).orElseThrow(() -> new RuntimeException("Not Found"));
         List<ProductCart> productCartList = this.productCartRepository.findAllProductCartByCartId(cart.getCartId());
         Optional<ProductCart> productCartOptional = productCartList.stream().filter(productCartData -> productCartData.getProductId() == productCartForm.getProductId()).findFirst();
@@ -85,13 +90,27 @@ public class CartServiceImpl implements ICartService {
                 } else {
                     this.productCartRepository.deleteById(productCart.getProductCartId());
                 }
+                CartResponse cartResponse = getCartResponseByUserId(productCartForm.getUserId());
+                simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
             } else {
-                productCart.setQuantity(productCart.getQuantity() + 1);
-                productCart.setDateUpdated(new Date());
-                this.productCartRepository.save(productCart);
-            }
+                Product product = this.productRepository.findById(productCartForm.getProductId()).orElse(null);
+                if (product != null) {
+                    if (product.getQuantity() > productCart.getQuantity()) {
+                        productCart.setQuantity(productCart.getQuantity() + 1);
+                        productCart.setDateUpdated(new Date());
+                        this.productCartRepository.save(productCart);
+                        CartResponse cartResponse = getCartResponseByUserId(productCartForm.getUserId());
+                        simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
+                    } else {
+                        MessageError messageError = new MessageError();
+                        messageError.setMessage("Sản phẩm này chỉ còn lại " + product.getQuantity());
+                        simpMessagingTemplate.convertAndSend("/topic/messageResponse", messageError);
+                    }
+                }
+                }
+
         }
-        return getCartResponseByUserId(productCartForm.getUserId());
+
     }
 
     @Override

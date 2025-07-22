@@ -1,7 +1,9 @@
 package com.order.product.controller;
 
+import com.order.product.model.dto.OrderResponse;
 import com.order.product.model.dto.ProductForm;
 import com.order.product.model.entity.Product;
+import com.order.product.service.order.IOrderService;
 import com.order.product.service.product.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,9 @@ public class StaffController {
     @Autowired
     private IProductService productService;
 
+    @Autowired
+    private IOrderService orderService;
+
     @PostMapping("/createNewProduct")
     public ResponseEntity<Product> createNewProduct(@RequestBody ProductForm productForm) {
         return new ResponseEntity<>(this.productService.saveProduct(productForm), HttpStatus.CREATED);
@@ -28,6 +33,11 @@ public class StaffController {
     @GetMapping("/getAllProducts")
     public ResponseEntity<List<Product>> getAllProducts() {
         return new ResponseEntity<>(this.productService.getAllProducts(), HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllOrder")
+    public ResponseEntity<List<OrderResponse>> getAllOrder() {
+        return new ResponseEntity<>(this.orderService.getAllOrder(), HttpStatus.OK);
     }
 
     @GetMapping("/getAllProductsOfBrand")
@@ -44,6 +54,11 @@ public class StaffController {
     public ResponseEntity<Product> deleteProduct(@RequestParam("productId") int id) {
         return new ResponseEntity<>(this.productService.deleteProduct(id), HttpStatus.OK);
     }
+    @PostMapping("/deleteMultipleProducts")
+    public ResponseEntity<?> deleteMultipleProducts(@RequestParam("productIds")  Integer[] productIds) {
+        this.productService.deleteMultipleProducts(productIds);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @PostMapping("/uploadProducts")
     public ResponseEntity<List<Product>> uploadProducts(@RequestBody ProductForm[] productForm) {
         return new ResponseEntity<>(this.productService.uploadProducts(productForm), HttpStatus.CREATED);
@@ -53,4 +68,6 @@ public class StaffController {
     public ResponseEntity<List<Product>> uploadEditProducts(@RequestBody ProductForm[] productForm) {
         return new ResponseEntity<>(this.productService.uploadEditProducts(productForm), HttpStatus.CREATED);
     }
+
+
 }

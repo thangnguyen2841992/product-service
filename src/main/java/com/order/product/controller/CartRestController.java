@@ -42,8 +42,7 @@ public class CartRestController {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             ProductCartForm productCartForm = objectMapper.readValue(message, ProductCartForm.class);
-            CartResponse cartResponse = this.cartService.editQuantity(productCartForm);
-            simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
+            this.cartService.editQuantity(productCartForm);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

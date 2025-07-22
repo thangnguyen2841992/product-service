@@ -205,6 +205,18 @@ public class ProductServiceImpl implements IProductService {
         return null;
     }
 
+    @Override
+    public void deleteMultipleProducts(Integer[] productIds) {
+        List<Product> products = this.productRepository.findAllById(List.of(productIds));
+
+        for (Product product : products) {
+            product.setDelete(true);
+            product.setDateUpdated(new Date());
+        }
+
+        this.productRepository.saveAll(products);
+    }
+
     private void editImages(ProductForm productForm, List<Image> imageList, Product newProduct) {
         List<Integer> currentImageIds = imageList.stream()
                 .map(Image::getImageId)

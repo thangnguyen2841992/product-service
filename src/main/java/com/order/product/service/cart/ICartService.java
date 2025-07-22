@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ICartService {
     CartResponse saveNewCart(CartForm cartForm);
-    CartResponse editQuantity(ProductCartForm productCartForm);
+    void editQuantity(ProductCartForm productCartForm);
     CartResponse getCartResponseByUserId(int userId);
     CartResponse removeProductCart(int productCartId);
     CartResponse removeAllProductCart(int cartId);

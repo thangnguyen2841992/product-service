@@ -17,4 +17,5 @@ public interface IProductService {
     Product getProductById(int id);
     Product updateProduct(ProductForm productForm);
     Product deleteProduct(int productId);
+    void deleteMultipleProducts(Integer[] productIds);
 }
