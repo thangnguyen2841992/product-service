@@ -1,12 +1,10 @@
 package com.order.product.service.order;
 
-import com.order.product.model.dto.CartResponse;
-import com.order.product.model.dto.MessageOrder;
-import com.order.product.model.dto.OrderForm;
-import com.order.product.model.dto.OrderResponse;
+import com.order.product.model.dto.*;
 import com.order.product.model.entity.*;
 import com.order.product.repository.*;
 import com.order.product.service.cart.ICartService;
+import com.order.product.service.notification.INotificationService;
 import com.order.product.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -50,6 +48,9 @@ public class OrderService implements IOrderService {
     private IProductRepository productRepository;
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private INotificationService notificationService;
+
 
     @Override
     @Transactional
@@ -70,7 +71,6 @@ public class OrderService implements IOrderService {
         int totalProduct = productCartList.stream()
                 .mapToInt(ProductCart::getQuantity)
                 .sum();
-
         List<Integer> productIds = productCartList.stream()
                 .map(ProductCart::getProductId)
                 .collect(Collectors.toList());
@@ -107,6 +107,23 @@ public class OrderService implements IOrderService {
         }
         this.productRepository.saveAll(productList);
         this.productCartRepository.deleteAll(productCartList);
+        Notification notification = new Notification();
+        notification.setOrderId(orderUser.getOrderId());
+        notification.setToUserId(orderUserSave.getUserId());
+        notification.setDateCreated(new Date());
+        notification.setStaff(false);
+        notification.setMessage("Bạn đã đặt đơn hàng có mã số #"+ orderUser.getOrderId()+ ". Chúng tôi sẽ gưi đơn hàng của bạn sớm" );
+        Notification notificationSave = notificationService.createNotificationOrder(notification);
+
+        Notification notificationStaff = new Notification();
+        notificationStaff.setOrderId(orderUser.getOrderId());
+        notificationStaff.setDateCreated(new Date());
+        notificationStaff.setStaff(true);
+        notificationStaff.setMessage("Có thêm 1 đơn hàng mã số #"+ orderUser.getOrderId()+ ". Bạn hãy kiểm tra nó" );
+        Notification notificationStaffSave = notificationService.createNotificationOrder(notificationStaff);
+        simpMessagingTemplate.convertAndSend("/topic/staffNotification", notificationStaffSave);
+
+
         MessageOrder messageOrder = new MessageOrder();
         User user = this.userRepository.findById(orderUser.getUserId()).orElse(null);
         if (user != null) {
@@ -129,6 +146,59 @@ public class OrderService implements IOrderService {
         return orderUserList.stream()
                 .map(this::getOrderResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public OrderUser processOrder(int orderId) {
+        OrderUser orderUser = this.orderRepository.findById(orderId).orElse(null);
+        if (orderUser != null) {
+            if (!orderUser.isProcess()) {
+                orderUser.setProcess(true);
+            }
+            this.orderRepository.save(orderUser);
+        }
+        Notification notification = new Notification();
+        assert orderUser != null;
+        notification.setOrderId(orderUser.getOrderId());
+        notification.setToUserId(orderUser.getUserId());
+        notification.setDateCreated(new Date());
+        notification.setStaff(false);
+        notification.setMessage("Đơn hàng có mã số #"+ orderUser.getOrderId()+ " đã được vận chuyển. Bạn hãy chú ý điện thoại." );
+        Notification notificationSave = notificationService.createNotificationOrder(notification);
+        simpMessagingTemplate.convertAndSend("/topic/userNotification", notificationSave);
+
+        MessageProcessOrder messageProcessOrder = new MessageProcessOrder();
+        messageProcessOrder.setOrderId(orderUser.getOrderId());
+        messageProcessOrder.setMessage("Đơn hàng có mã số #"+ orderUser.getOrderId()+ " đã được vận chuyển. Bạn hãy chú ý điện thoại." );
+        User user = this.userRepository.findById(orderUser.getUserId()).orElse(null);
+        if (user != null) {
+            messageProcessOrder.setToEmail(user.getEmail());
+            messageProcessOrder.setFullName(user.getFirstName() + " " + user.getLastName());
+        }
+        kafkaTemplate.send("send-email-order-message", messageProcessOrder);
+        return orderUser;
+    }
+
+    @Override
+    public OrderUser doneOrder(int orderId) {
+        OrderUser orderUser = this.orderRepository.findById(orderId).orElse(null);
+        if (orderUser != null) {
+            if (!orderUser.isDone()) {
+                orderUser.setDone(true);
+            }
+            this.orderRepository.save(orderUser);
+        }
+        MessageProcessOrder messageProcessOrder = new MessageProcessOrder();
+        assert orderUser != null;
+        messageProcessOrder.setOrderId(orderUser.getOrderId());
+        messageProcessOrder.setMessage("Đơn hàng có mã số #" + orderUser.getOrderId()+ " của bạn đã hoàn thành. Xin cám ơn!");
+        User user = this.userRepository.findById(orderUser.getUserId()).orElse(null);
+        if (user != null) {
+            messageProcessOrder.setToEmail(user.getEmail());
+            messageProcessOrder.setFullName(user.getFirstName() + " " + user.getLastName());
+        }
+        kafkaTemplate.send("send-email-order-message", messageProcessOrder);
+        return orderUser;
     }
 
     private OrderResponse getOrderResponse(OrderUser orderUser) {

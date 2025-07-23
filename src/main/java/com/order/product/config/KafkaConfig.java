@@ -10,4 +10,9 @@ public class KafkaConfig {
     NewTopic checkSendOrderTopic() {
         return new NewTopic("send-email-order",2,(short) 1);
     }
+
+    @Bean
+    NewTopic checkSendOrderMessageTopic() {
+        return new NewTopic("send-email-order-message",2,(short) 1);
+    }
 }
