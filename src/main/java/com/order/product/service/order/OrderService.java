@@ -5,14 +5,12 @@ import com.order.product.model.entity.*;
 import com.order.product.repository.*;
 import com.order.product.service.cart.ICartService;
 import com.order.product.service.notification.INotificationService;
-import com.order.product.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
