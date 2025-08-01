@@ -11,6 +11,7 @@ public interface IOrderService {
     CartResponse createNewOrder(OrderForm orderForm);
 
     List<OrderResponse> getAllOrder();
+    List<OrderResponse> getAllOrderOfUser(int userId);
 
     OrderUser processOrder(int orderId);
     OrderUser doneOrder(int orderId);

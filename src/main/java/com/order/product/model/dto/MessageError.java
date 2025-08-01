@@ -8,5 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class MessageError {
+    private int toUserId;
+    private boolean isError;
     private String message;
 }

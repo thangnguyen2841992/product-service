@@ -29,10 +29,14 @@ public class OrderRestController {
         try {
             OrderForm orderForm = objectMapper.readValue(message, OrderForm.class);
             CartResponse cartResponse = this.orderService.createNewOrder(orderForm);
-            simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
-            MessageError messageError = new MessageError();
-            messageError.setMessage("Bạn đã đặt hàng thành công. Chúng tôi đang xử lý đơn hàng của bạn.");
-            simpMessagingTemplate.convertAndSend("/topic/order", messageError);
+            if (cartResponse != null) {
+                simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
+                MessageError messageError = new MessageError();
+                messageError.setToUserId(orderForm.getUserId());
+                messageError.setError(false);
+                messageError.setMessage("Bạn đã đặt hàng thành công. Chúng tôi đang xử lý đơn hàng của bạn.");
+                simpMessagingTemplate.convertAndSend("/topic/order", messageError);
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

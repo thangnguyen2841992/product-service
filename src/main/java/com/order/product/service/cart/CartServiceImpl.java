@@ -103,6 +103,7 @@ public class CartServiceImpl implements ICartService {
                         simpMessagingTemplate.convertAndSend("/topic/cart", cartResponse);
                     } else {
                         MessageError messageError = new MessageError();
+                        messageError.setToUserId(productCartForm.getUserId());
                         messageError.setMessage("Sản phẩm này chỉ còn lại " + product.getQuantity());
                         simpMessagingTemplate.convertAndSend("/topic/messageResponse", messageError);
                     }

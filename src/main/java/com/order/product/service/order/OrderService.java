@@ -100,7 +100,20 @@ public class OrderService implements IOrderService {
         for (ProductCart productCart : productCartList) {
             Product product = productMap.get(productCart.getProductId());
             if (product != null) {
-                product.setQuantity(product.getQuantity() - productCart.getQuantity());
+                if (product.getQuantity() >= productCart.getQuantity()) {
+                    product.setQuantity(product.getQuantity() - productCart.getQuantity());
+                } else {
+                    MessageError messageError = new MessageError();
+                    messageError.setToUserId(orderForm.getUserId());
+                    messageError.setError(true);
+                    if (product.getQuantity() > 0) {
+                        messageError.setMessage("Sản phẩm " + product.getProductName() + " chỉ còn lại " + product.getQuantity() + " sản phẩm.");
+                    } else {
+                        messageError.setMessage("Sản phẩm " + product.getProductName() + " đã hết hàng.");
+                    }
+                    simpMessagingTemplate.convertAndSend("/topic/order", messageError);
+                    return null;
+                }
             }
         }
         this.productRepository.saveAll(productList);
@@ -141,6 +154,14 @@ public class OrderService implements IOrderService {
     @Override
     public List<OrderResponse> getAllOrder() {
         List<OrderUser> orderUserList = this.orderRepository.findAll();
+        return orderUserList.stream()
+                .map(this::getOrderResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrderOfUser(int userId) {
+        List<OrderUser> orderUserList = this.orderRepository.findByUserId(userId);
         return orderUserList.stream()
                 .map(this::getOrderResponse)
                 .collect(Collectors.toList());
