@@ -10,6 +10,7 @@ public class EndPoints {
     public static final String[] PUBLIC_GET = {
             "/image-api/**",
             "/ws/**",
+            "/chat/**",
     };
     public static final String[] PUBLIC_POST = {
             "/image-api/**",

@@ -130,10 +130,9 @@ public class OrderService implements IOrderService {
         notificationStaff.setOrderId(orderUser.getOrderId());
         notificationStaff.setDateCreated(new Date());
         notificationStaff.setStaff(true);
-        notificationStaff.setMessage("Có thêm 1 đơn hàng mã số #"+ orderUser.getOrderId()+ ". Bạn hãy kiểm tra nó" );
+        notificationStaff.setMessage("Có thêm 1 đơn hàng mã số #"+ orderUser.getOrderId());
         Notification notificationStaffSave = notificationService.createNotificationOrder(notificationStaff);
         simpMessagingTemplate.convertAndSend("/topic/staffNotification", notificationStaffSave);
-
 
         MessageOrder messageOrder = new MessageOrder();
         User user = this.userRepository.findById(orderUser.getUserId()).orElse(null);

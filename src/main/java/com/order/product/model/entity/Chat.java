@@ -14,20 +14,18 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Entity
-public class Notification {
+public class Chat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int notificationId;
-
-    private int toUserId;
-
-    private int orderId;
-
     private int chatId;
 
-    private  String message;
+    private int processId;
 
+    private int formUserId;
+
+    private int staffId;
+    private String content;
+
+    private boolean isReplied;
     private Date dateCreated;
-
-    private boolean isStaff;
 }
