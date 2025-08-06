@@ -2,10 +2,10 @@ package com.order.product.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.order.product.model.dto.CartForm;
-import com.order.product.model.dto.CartResponse;
-import com.order.product.model.dto.ChatApproval;
+import com.order.product.model.dto.ChatRequest;
+import com.order.product.model.dto.WaitingChatResponse;
 import com.order.product.model.entity.Chat;
+import com.order.product.model.entity.WaitingChat;
 import com.order.product.service.chat.IChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,27 +26,26 @@ public class ChatRestController {
     public void addNewChat(@Payload String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Chat newChat = objectMapper.readValue(message, Chat.class);
+            ChatRequest newChat = objectMapper.readValue(message, ChatRequest.class);
             this.chatService.addChat(newChat);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
-
-    @MessageMapping("/approval-chat")
-    public void approvalChat(@Payload String message) {
+    @MessageMapping("/add-chatRoom")
+    public void addChatRoom(@Payload String message) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            ChatApproval newChat = objectMapper.readValue(message, ChatApproval.class);
-            this.chatService.approvalChat(newChat);
+            ChatRequest newChat = objectMapper.readValue(message, ChatRequest.class);
+            this.chatService.addChatRoom(newChat);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @GetMapping("chat/getAllChat")
-    public ResponseEntity<List<Chat>> getAllChat(@RequestParam("chatId") int chatId) {
-        List<Chat> chats = this.chatService.findAllChatOfUser(chatId);
-        return ResponseEntity.ok(chats);
+    @GetMapping("/staff-api/findWaitingChatByDeleted")
+    public ResponseEntity<List<WaitingChatResponse>> findWaitingChatByDeleted() {
+        return ResponseEntity.ok(this.chatService.findWaitingChatByDeleted());
     }
+
 }

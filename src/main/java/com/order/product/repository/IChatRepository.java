@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ChatRepository extends JpaRepository<Chat, Integer> {
+public interface IChatRepository extends JpaRepository<Chat, Integer> {
 
     @Query(value = "select * from chat where process_id = :processId", nativeQuery = true)
     List<Chat> findAllChatOfUser(@Param("processId") int processId);

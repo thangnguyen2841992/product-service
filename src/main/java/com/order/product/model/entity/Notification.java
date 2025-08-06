@@ -23,11 +23,15 @@ public class Notification {
 
     private int orderId;
 
-    private int chatId;
+    private int chatRoomId;
+
+    private int waitingChatId;
 
     private  String message;
 
     private Date dateCreated;
 
     private boolean isStaff;
+
+    private boolean isChat;
 }

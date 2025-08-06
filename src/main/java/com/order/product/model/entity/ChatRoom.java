@@ -14,18 +14,16 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Entity
-public class Chat {
+public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int chatId;
-
-
     private int chatRoomId;
 
     private int formUserId;
 
-    private int toUserId;
-    private String content;
+    private int staffId;
 
     private Date dateCreated;
+
+    private boolean isClosed;
 }
