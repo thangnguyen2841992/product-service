@@ -9,22 +9,17 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ChatResponse {
-
-    private int formUserId;
-
-    private String formUserName;
-
-    private int toUserId;
-
-    private String toUserName;
+public class ChatRoomResponse {
 
     private int chatRoomId;
 
-    private String content;
+    private int formUserId;
+    private String formUsername;
+
+    private int staffId;
+    private String staffName;
 
     private Date dateCreated;
 
-    private boolean showPopup;
-
+    private boolean isClosed;
 }

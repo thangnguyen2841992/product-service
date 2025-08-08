@@ -11,10 +11,13 @@ public class EndPoints {
             "/image-api/**",
             "/ws/**",
             "/chat/**",
+            "/all-api/**"
+
     };
     public static final String[] PUBLIC_POST = {
             "/image-api/**",
             "/ws/**",
+            "/all-api/**"
 
     };
     public static final String[] USER_GET = {
@@ -22,7 +25,7 @@ public class EndPoints {
             "/product-unit-api/**",
             "/user-api/**",
             "/cart-api/**",
-            "/order-api/**",
+            "/order-api/**"
 
 
     };
@@ -30,6 +33,7 @@ public class EndPoints {
             "/user-api/**",
             "/cart-api/**",
             "/order-api/**"
+
     };
     public static final String FRONT_END_HOST = "http://localhost:3000";
 

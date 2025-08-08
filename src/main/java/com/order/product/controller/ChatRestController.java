@@ -3,9 +3,9 @@ package com.order.product.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.order.product.model.dto.ChatRequest;
+import com.order.product.model.dto.ChatResponse;
+import com.order.product.model.dto.ChatRoomResponse;
 import com.order.product.model.dto.WaitingChatResponse;
-import com.order.product.model.entity.Chat;
-import com.order.product.model.entity.WaitingChat;
 import com.order.product.service.chat.IChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,5 +47,17 @@ public class ChatRestController {
     public ResponseEntity<List<WaitingChatResponse>> findWaitingChatByDeleted() {
         return ResponseEntity.ok(this.chatService.findWaitingChatByDeleted());
     }
+
+    @GetMapping("/staff-api/getAllChatRoomOfStaffId")
+    public ResponseEntity<List<ChatRoomResponse>> getAllChatRoomOfStaffId(@RequestParam("staffId") int staffId) {
+        return ResponseEntity.ok(this.chatService.getAllChatRoomOfStaffId(staffId));
+    }
+
+    @GetMapping("/all-api/findAllChatOfUser")
+    public ResponseEntity<List<ChatResponse>> findAllChatOfUser(@RequestParam("userId") int userId) {
+        return ResponseEntity.ok(this.chatService.findAllChatOfUser(userId));
+    }
+
+
 
 }
