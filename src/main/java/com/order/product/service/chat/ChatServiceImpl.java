@@ -43,8 +43,14 @@ public class ChatServiceImpl implements IChatService {
     @Transactional
     public void addChat(ChatRequest chat) {
         WaitingChat waitingChat = waitingChatRepository.findWaitingChatByUserId(chat.getFormUserId()).orElse(null);
-        ChatRoom chatRoom = chatRoomRepository.getChatRoomOfUserId(chat.getFormUserId()).orElse(null);
-        if (waitingChat == null && chatRoom == null) {
+
+        ChatRoom chatRoom = new ChatRoom();
+        if ("N".equals(chat.getIsStaff())) {
+            chatRoom = chatRoomRepository.getChatRoomOfUserId(chat.getFormUserId()).orElse(null);
+        } else {
+            chatRoom = chatRoomRepository.findById(chat.getChatRoomId()).orElse(null);
+        }
+        if (waitingChat == null && chatRoom == null && "N".equals(chat.getIsStaff())) {
             WaitingChat newWaitingChat = new WaitingChat();
             newWaitingChat.setUserId(chat.getFormUserId());
             newWaitingChat.setContent(chat.getContent());
@@ -55,7 +61,7 @@ public class ChatServiceImpl implements IChatService {
             userRepository.findById(newChatSave.getUserId()).ifPresent(user -> chatResponse.setFormUserName(user.getUsername()));
             chatResponse.setFormUserId(newChatSave.getUserId());
             chatResponse.setDateCreated(newChatSave.getDateCreated());
-            simpMessagingTemplate.convertAndSend("/topic/chat", chatResponse);
+            simpMessagingTemplate.convertAndSend("/topic/waitingChat", chatResponse);
 
             Notification notification = new Notification();
             notification.setWaitingChatId(newChatSave.getMessageId());
@@ -65,17 +71,23 @@ public class ChatServiceImpl implements IChatService {
             notification.setChat(true);
             Notification notificationSave = notificationService.createNotificationOrder(notification);
             simpMessagingTemplate.convertAndSend("/topic/staffNotification", notificationSave);
-        } else if (chatRoom != null) {
+        } else if (chatRoom != null || "Y".equals(chat.getIsStaff())) {
             Chat newChat = new Chat();
             newChat.setContent(chat.getContent());
             newChat.setDateCreated(new Date());
             newChat.setFormUserId(chat.getFormUserId());
-            newChat.setToUserId(chatRoom.getStaffId());
+            assert chatRoom != null;
+            if ("Y".equals(chat.getIsStaff())) {
+                newChat.setToUserId(chatRoom.getFormUserId());
+            } else {
+                newChat.setToUserId(chatRoom.getStaffId());
+            }
             newChat.setChatRoomId(chatRoom.getChatRoomId());
             this.chatRepository.save(newChat);
             ChatResponse chatResponse = new ChatResponse();
             chatResponse.setFormUserId(newChat.getFormUserId());
             chatResponse.setToUserId(newChat.getToUserId());
+            chatResponse.setChatRoomId(newChat.getChatRoomId());
             simpMessagingTemplate.convertAndSend("/topic/chat", chatResponse);
         }
     }
@@ -111,6 +123,7 @@ public class ChatServiceImpl implements IChatService {
             chatStaff.setChatRoomId(chatRoomSave.getChatRoomId());
             this.chatRepository.save(chatStaff);
 
+
             ChatResponse chatResponse = new ChatResponse();
             userRepository.findById(chat.getFormUserId()).ifPresent(user -> chatResponse.setFormUserName(user.getFirstName() + " " + user.getLastName()));
             userRepository.findById(chat.getToUserId()).ifPresent(user -> chatResponse.setToUserName(user.getFirstName() + " " + user.getLastName()));
@@ -118,7 +131,21 @@ public class ChatServiceImpl implements IChatService {
             chatResponse.setToUserId(chat.getToUserId());
             chatResponse.setDateCreated(chat.getDateCreated());
             chatResponse.setShowPopup(true);
+            chatResponse.setChatRoomId(chatRoomSave.getChatRoomId());
             simpMessagingTemplate.convertAndSend("/topic/chat", chatResponse);
+        }
+    }
+
+    @Override
+    public void closeChatRoom(ChatRequest chatRequest) {
+        ChatRoom chatRoom = this.chatRoomRepository.findById(chatRequest.getChatRoomId()).orElse(null);
+        if (chatRoom != null) {
+            chatRoom.setClosed(true);
+            this.chatRoomRepository.save(chatRoom);
+            ChatResponse chatResponse = new ChatResponse();
+            chatResponse.setFormUserId(chatRoom.getFormUserId());
+            chatResponse.setToUserId(chatRoom.getStaffId());
+            simpMessagingTemplate.convertAndSend("/topic/closeChatRoom", chatResponse);
         }
     }
 
@@ -193,6 +220,39 @@ public class ChatServiceImpl implements IChatService {
     @Override
     public List<ChatResponse> findAllChatOfUser(int userId) {
         List<Chat> chats = this.chatRepository.findAllChatOfUser(userId);
+
+        Set<Integer> formUserIds = chats.stream()
+                .map(Chat::getFormUserId)
+                .collect(Collectors.toSet());
+        Set<Integer> toUserIds = chats.stream()
+                .map(Chat::getToUserId)
+                .collect(Collectors.toSet());
+
+        Map<Integer, String> formUsers = userRepository.findAllById(formUserIds)
+                .stream()
+                .collect(Collectors.toMap(User::getUserId, user -> user.getFirstName() + " " + user.getLastName()));
+
+        Map<Integer, String> toUsers = userRepository.findAllById(toUserIds)
+                .stream()
+                .collect(Collectors.toMap(User::getUserId, user -> user.getFirstName() + " " + user.getLastName()));
+
+        return chats.stream().map(chat -> {
+            ChatResponse chatResponse = new ChatResponse();
+            chatResponse.setShowPopup(true);
+            chatResponse.setChatRoomId(chat.getChatRoomId());
+            chatResponse.setContent(chat.getContent());
+            chatResponse.setDateCreated(chat.getDateCreated());
+            chatResponse.setFormUserId(chat.getFormUserId());
+            chatResponse.setToUserId(chat.getToUserId());
+            chatResponse.setFormUserName(formUsers.get(chat.getFormUserId()));
+            chatResponse.setToUserName(toUsers.get(chat.getToUserId()));
+            return chatResponse;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChatResponse> findAllChatOfStaff(int userId, int chatRoomId) {
+        List<Chat> chats = this.chatRepository.findAllChatOfStaff(userId, chatRoomId);
 
         Set<Integer> formUserIds = chats.stream()
                 .map(Chat::getFormUserId)

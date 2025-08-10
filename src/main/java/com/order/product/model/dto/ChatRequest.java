@@ -18,4 +18,7 @@ public class ChatRequest {
     private int messageId;
 
     private Date dateCreated;
+
+    private String isStaff;
+    private int chatRoomId;
 }

@@ -13,4 +13,7 @@ public interface IChatRepository extends JpaRepository<Chat, Integer> {
 
     @Query(value = "select * from chat where (form_user_id = :userId or to_user_id = :userId) and chat_room_id in (select chat_room_id from chat_room where is_closed = false)order by date_created desc", nativeQuery = true)
     List<Chat> findAllChatOfUser(@Param("userId") int userId);
+
+    @Query(value = "select * from chat where (form_user_id = :userId or to_user_id = :userId) and chat_room_id  = :chatRoomId order by date_created desc", nativeQuery = true)
+    List<Chat> findAllChatOfStaff(@Param("userId") int userId, @Param("chatRoomId") int chatRoomId);
 }

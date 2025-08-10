@@ -14,11 +14,13 @@ import java.util.List;
 public interface IChatService {
    void addChat(ChatRequest chatRequest);
    void addChatRoom(ChatRequest chatRequest);
+   void closeChatRoom(ChatRequest chatRequest);
 
    List<WaitingChatResponse> findWaitingChatByDeleted();
 
    List<ChatRoomResponse> getAllChatRoomOfStaffId(int staffId);
 
    List<ChatResponse> findAllChatOfUser(int userId);
+   List<ChatResponse> findAllChatOfStaff(int userId, int chatRoomId);
 
 }

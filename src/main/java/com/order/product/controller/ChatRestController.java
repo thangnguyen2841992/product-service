@@ -42,6 +42,16 @@ public class ChatRestController {
             throw new RuntimeException(e);
         }
     }
+    @MessageMapping("/close-chatRoom")
+    public void closeChatRoom(@Payload String message) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ChatRequest newChat = objectMapper.readValue(message, ChatRequest.class);
+            this.chatService.closeChatRoom(newChat);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @GetMapping("/staff-api/findWaitingChatByDeleted")
     public ResponseEntity<List<WaitingChatResponse>> findWaitingChatByDeleted() {
@@ -56,6 +66,10 @@ public class ChatRestController {
     @GetMapping("/all-api/findAllChatOfUser")
     public ResponseEntity<List<ChatResponse>> findAllChatOfUser(@RequestParam("userId") int userId) {
         return ResponseEntity.ok(this.chatService.findAllChatOfUser(userId));
+    }
+    @GetMapping("/all-api/findAllChatOfStaff")
+    public ResponseEntity<List<ChatResponse>> findAllChatOfStaff(@RequestParam("userId") int userId, @RequestParam("chatRoomId") int chatRoomId) {
+        return ResponseEntity.ok(this.chatService.findAllChatOfStaff(userId, chatRoomId));
     }
 
 

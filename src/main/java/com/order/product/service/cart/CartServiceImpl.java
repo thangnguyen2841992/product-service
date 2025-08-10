@@ -117,7 +117,8 @@ public class CartServiceImpl implements ICartService {
     @Override
     public CartResponse getCartResponseByUserId(int userId) {
         CartResponse cartResponse = new CartResponse();
-        Cart cart = this.cartRepository.findCartByUserId(userId).orElseThrow(() -> new RuntimeException("Not Found"));
+        Cart cart = this.cartRepository.findCartByUserId(userId).orElse(null);
+        assert cart != null;
         List<ProductCart> productCartList = this.productCartRepository.findAllProductCartByCartId(cart.getCartId());
         List<Integer> productIds = productCartList.stream()
                 .map(ProductCart::getProductId)
