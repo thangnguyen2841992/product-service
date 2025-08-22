@@ -2,6 +2,7 @@ package com.order.product.controller;
 
 import com.order.product.model.dto.OrderResponse;
 import com.order.product.model.dto.ProductForm;
+import com.order.product.model.dto.TotalQuantityProductResponse;
 import com.order.product.model.entity.Notification;
 import com.order.product.model.entity.OrderUser;
 import com.order.product.model.entity.Product;
@@ -90,4 +91,15 @@ public class StaffController {
     public ResponseEntity<List<Notification>> getAllNotificationsOfStaff(){
         return new ResponseEntity<>(this.notificationService.getAllNotificattionOfStaff(), HttpStatus.OK );
     }
+    @GetMapping("/findListTotalProductOfMonth")
+    public ResponseEntity<List<TotalQuantityProductResponse>> findListTotalProductOfMonth(@RequestParam("month") int month) {
+        List<TotalQuantityProductResponse> totalQuantityProductResponses = this.orderService.findListTotalProductOfMonth(month);
+        return new ResponseEntity<>(totalQuantityProductResponses, HttpStatus.OK);
+    }
+    @GetMapping("/getAllTotalPriceOfYear")
+    public ResponseEntity<List<TotalQuantityProductResponse>> getAllTotalPriceOfYear() {
+        List<TotalQuantityProductResponse> totalQuantityProductResponses = this.orderService.getAllTotalPriceOfYear();
+        return new ResponseEntity<>(totalQuantityProductResponses, HttpStatus.OK);
+    }
+
 }

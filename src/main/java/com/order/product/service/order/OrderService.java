@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -217,6 +218,18 @@ public class OrderService implements IOrderService {
         }
         kafkaTemplate.send("send-email-order-message", messageProcessOrder);
         return orderUser;
+    }
+
+    @Override
+    public List<TotalQuantityProductResponse> findListTotalProductOfMonth(int month) {
+        LocalDate startDate = LocalDate.of(2025, month, 1);
+        LocalDate endDate = startDate.plusMonths(1);
+        return this.productOrderRepository.findListTotalProductOfMonth(startDate, endDate);
+    }
+
+    @Override
+    public List<TotalQuantityProductResponse> getAllTotalPriceOfYear() {
+        return this.productOrderRepository.getAllTotalPriceOfYear();
     }
 
     private OrderResponse getOrderResponse(OrderUser orderUser) {
